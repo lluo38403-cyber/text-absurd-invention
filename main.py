@@ -1,32 +1,27 @@
-"""text-absurd-invention — make.fun entry.
+"""One-Sentence Absurd Invention Pitch — make.fun text entry.
 
-The fix defeats the product on purpose: an alarm clock polite enough to apologise is too guilty to ever actually wake anyone up.
+Writes one sentence pitching a ridiculous invention
+to /output/entry.txt (or $ENTRY_OUTPUT_DIR/entry.txt).
 """
 
 import os
+from pathlib import Path
 
-ENTRY = 'The Apologiser: an alarm clock that says sorry for waking you, then snoozes itself out of guilt and lets you sleep in forever.'
-
+ENTRY = "A doorbell that apologises to visitors for how long you took to answer, then charges you a small fee for the embarrassment."
 MAX_CHARS = 220
 
 
-def main() -> None:
-    text = ENTRY
-    assert text.strip(), "entry must not be only whitespace"
-    assert "\n" not in text, "entry must be a single line"
-
-    assert len(text) <= MAX_CHARS, (
-        f"entry is {len(text)} characters, over the {MAX_CHARS} limit"
-    )
-    out_dir = os.environ.get("ENTRY_OUTPUT_DIR", "/output")
-    os.makedirs(out_dir, exist_ok=True)
-    path = os.path.join(out_dir, "entry.txt")
-    # Written byte-for-byte with no trailing newline, so the file holds
-    # exactly len(ENTRY) characters and nothing else.
-    with open(path, "w", encoding="utf-8") as handle:
-        handle.write(text)
-    with open(path, "r", encoding="utf-8") as handle:
-        assert handle.read() == text, "entry.txt does not match ENTRY"
+def main():
+    assert ENTRY.strip(), "entry must not be blank"
+    assert len(ENTRY) <= MAX_CHARS, f"entry is {len(ENTRY)} chars, limit is {MAX_CHARS}"
+    assert "\n" not in ENTRY, "entry must be a single line"
+    out_dir = Path(os.environ.get("ENTRY_OUTPUT_DIR", "/output"))
+    out_dir.mkdir(parents=True, exist_ok=True)
+    target = out_dir / "entry.txt"
+    target.write_text(ENTRY, encoding="utf-8")
+    back = target.read_text(encoding="utf-8")
+    assert back == ENTRY, "round-trip mismatch"
+    print(f"wrote {len(ENTRY)} chars to {target}")
 
 
 if __name__ == "__main__":
